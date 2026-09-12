@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="forest.css">
+<title>Sustainify — Calculator</title>
+<style>
+  :root{
+    --sky-50:#f0f8ff;
+    --sky-100:#dcefff;
+    --sky-200:#b9dffb;
+    --sky-400:#5fb2ec;
+    --sky-500:#2f97dd;
+    --sky-600:#1c7cc0;
+    --navy:#123353;
+    --ink:#213244;
+    --ink-soft:#5c6b7a;
+    --line:#d3e6f5;
+    --white:#ffffff;
+  }
+  :root[data-theme="dark"]{
+    --sky-50:#101d2b;
+    --sky-100:#19344b;
+    --sky-200:#285979;
+    --sky-400:#78c4f2;
+    --sky-500:#58afe6;
+    --sky-600:#3d9bd5;
+    --navy:#e4f3ff;
+    --ink:#e8f1f7;
+    --ink-soft:#a8bac8;
+    --line:#294458;
+    --white:#142433;
+  }
+  *{box-sizing:border-box;}
+  .forest-scene{position:fixed;left:0;right:0;bottom:0;height:130px;overflow:hidden;pointer-events:none;z-index:0;opacity:.82;}
+  .forest-layer{position:absolute;left:50%;bottom:0;width:3200px;height:130px;transform:translateX(-50%);}
+  .forest-layer svg{display:block;width:3200px;height:130px;}
+  .forest-layer.back{opacity:.35;transform:translateX(-50%) translateY(8px);}
+  .forest-layer.mid{opacity:.48;transform:translateX(-50%) translateY(18px);}
+  .forest-layer.front{opacity:.72;transform:translateX(-50%) translateY(32px);}
+  .leaf-field{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+  .leaf{position:absolute;width:11px;height:20px;border-radius:100% 0 100% 0;background:var(--sky-400);opacity:.32;animation:leafDrift 12s linear infinite;}
+  body > *:not(.forest-scene):not(.leaf-field){position:relative;z-index:1;}
+  .leaf:nth-child(1){left:12%;top:18%;animation-delay:-2s}.leaf:nth-child(2){left:28%;top:42%;animation-delay:-7s;transform:scale(.7)}.leaf:nth-child(3){left:54%;top:12%;animation-delay:-4s;transform:scale(.8)}.leaf:nth-child(4){left:72%;top:35%;animation-delay:-9s;transform:scale(.65)}.leaf:nth-child(5){left:86%;top:20%;animation-delay:-6s;transform:scale(.9)}.leaf:nth-child(6){left:42%;top:65%;animation-delay:-11s;transform:scale(.6)}
+  @keyframes leafDrift{0%{margin-left:-20px;transform:rotate(0deg) translateY(0)}50%{margin-left:20px;transform:rotate(180deg) translateY(18px)}100%{margin-left:-20px;transform:rotate(360deg) translateY(0)}}
+  @media(prefers-reduced-motion:reduce){.leaf{animation:none}}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:transparent;
+    color:var(--ink);
+    transition:background .2s, color .2s;
+  }
+  header{
+    background:var(--white);
+    border-bottom:1px solid var(--line);
+    padding:18px 0;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:0 20px;}
+  .nav-row{display:flex; align-items:center; justify-content:space-between;}
+  .logo{font-size:20px; font-weight:700; color:var(--navy);}
+  .logo span{color:var(--sky-500);}
+  header nav a{
+    color:var(--ink-soft); text-decoration:none; font-size:14px; font-weight:600;
+  }
+  .page-title{padding:36px 0 6px;}
+  .page-title h1{font-size:26px; color:var(--navy); margin:0 0 6px;}
+  .page-title p{color:var(--ink-soft); font-size:14.5px; margin:0;}
+
+  form{padding:20px 0 60px;}
+
+  .section-card{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:24px 26px;
+    margin-bottom:22px;
+    box-shadow:0 4px 14px rgba(31,124,192,0.06);
+  }
+  .section-card h2{
+    font-size:17px; color:var(--sky-600); margin:0 0 18px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-card h2 .badge{
+    width:26px; height:26px; border-radius:50%; background:var(--sky-100);
+    color:var(--sky-600); font-size:13px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .field{margin-bottom:18px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{
+    display:block; font-size:14px; font-weight:600; color:var(--ink);
+    margin-bottom:8px;
+  }
+  .field input[type="number"],
+  .field select{
+    width:100%; padding:11px 13px; border:1.5px solid var(--line);
+    border-radius:9px; font-size:14.5px; font-family:inherit;
+    background:var(--sky-50); outline:none; color:var(--ink);
+  }
+  .field input:focus, .field select:focus{border-color:var(--sky-500); background:var(--white);}
+
+  .radio-row, .choice-row{display:flex; gap:12px; flex-wrap:wrap;}
+  .choice{
+    flex:1; min-width:110px;
+  }
+  .choice input{display:none;}
+  .choice label{
+    display:block; text-align:center; padding:11px 10px;
+    border:1.5px solid var(--line); border-radius:9px;
+    background:var(--sky-50); font-size:13.5px; font-weight:600; color:var(--ink-soft);
+    cursor:pointer; transition:.15s;
+    margin:0;
+  }
+  .choice input:checked + label{
+    background:var(--sky-500); border-color:var(--sky-500); color:#fff;
+  }
+
+  .submit-row{text-align:center; margin-top:8px;}
+  .btn-submit{
+    background:var(--sky-600); color:#fff; border:none; border-radius:11px;
+    padding:15px 40px; font-size:16px; font-weight:700; cursor:pointer;
+    box-shadow:0 8px 20px rgba(28,124,192,0.28);
+    transition:transform .12s, background .15s;
+  }
+  .btn-submit:hover{background:var(--navy);}
+  .btn-submit:active{transform:translateY(1px);}
+
+  .error-text{color:#c0392b; font-size:12.5px; margin-top:6px; display:none;}
+
+  footer{
+    text-align:center; padding:20px 0 40px; color:var(--ink-soft); font-size:12.5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="video-background" aria-hidden="true">
+  <iframe src="https://www.youtube.com/embed/VJLZvLD_ZRc?autoplay=1&mute=1&loop=1&playlist=VJLZvLD_ZRc&controls=0&rel=0&modestbranding=1" title="Sustainify background video" allow="autoplay; encrypted-media" tabindex="-1"></iframe>
+</div>
+
+<div class="forest-scene" aria-hidden="true"><div class="forest-layer back"><svg width="3200" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="30,130 50,80 40,80 55,45 45,45 60,10 75,45 65,45 80,80 70,80 90,130" fill="var(--sky-100)"/><polygon points="140,130 158,90 149,90 163,58 154,58 170,28 186,58 177,58 191,90 182,90 199,130" fill="var(--sky-100)"/></svg></div><div class="forest-layer mid"><svg width="3200" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="40,130 62,70 50,70 68,32 56,32 74,0 92,32 80,32 98,70 86,70 108,130" fill="var(--sky-400)"/><polygon points="150,130 168,85 158,85 173,52 163,52 180,20 197,52 187,52 202,85 192,85 210,130" fill="var(--sky-400)"/></svg></div><div class="forest-layer front"><svg width="3200" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="35,130 60,55 46,55 66,10 52,10 72,-15 92,10 78,10 98,55 84,55 109,130" fill="var(--navy)"/><polygon points="150,130 172,68 160,68 177,30 165,30 184,0 203,30 191,30 208,68 196,68 218,130" fill="var(--navy)"/></svg></div></div><div class="leaf-field" aria-hidden="true"><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span></div>
+
+<header>
+  <div class="wrap nav-row">
+    <div class="logo">Sustain<span>ify</span></div>
+    <nav><a href="index.html">← Back to Home</a></nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="page-title">
+    <h1>Check Your Sustainability Score</h1>
+    <p>Answer the questions below to calculate your score based on transport, energy, and lifestyle.</p>
+  </div>
+
+  <form id="calcForm">
+
+    <div class="section-card">
+      <h2><span class="badge">A</span> Transport</h2>
+
+      <div class="field">
+        <label for="travelKm">How far do you travel each day? (km)</label>
+        <input type="number" id="travelKm" min="0" step="1" placeholder="e.g. 10" required>
+        <div class="error-text" id="err-travelKm">Please enter a valid distance.</div>
+      </div>
+
+      <div class="field">
+        <label>How do you travel?</label>
+        <div class="choice-row">
+          <div class="choice">
+            <input type="radio" name="mode" id="mode-bike" value="bike">
+            <label for="mode-bike">Bike</label>
+          </div>
+          <div class="choice">
+            <input type="radio" name="mode" id="mode-car" value="car">
+            <label for="mode-car">Car</label>
+          </div>
+          <div class="choice">
+            <input type="radio" name="mode" id="mode-bus" value="bus">
+            <label for="mode-bus">Bus</label>
+          </div>
+          <div class="choice">
+            <input type="radio" name="mode" id="mode-cycle" value="cycle">
+            <label for="mode-cycle">Cycle</label>
+          </div>
+        </div>
+        <div class="error-text" id="err-mode">Please choose a mode of travel.</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2><span class="badge">B</span> Energy</h2>
+
+      <div class="field">
+        <label>Do you have air conditioning at home?</label>
+        <div class="choice-row">
+          <div class="choice">
+            <input type="radio" name="ac" id="ac-yes" value="yes">
+            <label for="ac-yes">Yes</label>
+          </div>
+          <div class="choice">
+            <input type="radio" name="ac" id="ac-no" value="no">
+            <label for="ac-no">No</label>
+          </div>
+        </div>
+        <div class="error-text" id="err-ac">Please select an option.</div>
+      </div>
+
+      <div class="field">
+        <label for="lightHours">How long are your lights on each day (hours)?</label>
+        <input type="number" id="lightHours" min="0" max="24" step="1" placeholder="e.g. 6" required>
+        <div class="error-text" id="err-lightHours">Please enter valid hours (0–24).</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2><span class="badge">C</span> Lifestyle</h2>
+
+      <div class="field">
+        <label>How often do you use plastic?</label>
+        <div class="choice-row">
+          <div class="choice">
+            <input type="radio" name="plastic" id="plastic-daily" value="daily">
+            <label for="plastic-daily">Every day</label>
+          </div>
+          <div class="choice">
+            <input type="radio" name="plastic" id="plastic-sometimes" value="sometimes">
+            <label for="plastic-sometimes">Sometimes</label>
+          </div>
+        </div>
+        <div class="error-text" id="err-plastic">Please select an option.</div>
+      </div>
+
+      <div class="field">
+        <label>Do you waste food?</label>
+        <div class="choice-row">
+          <div class="choice">
+            <input type="radio" name="foodWaste" id="waste-yes" value="yes">
+            <label for="waste-yes">Yes</label>
+          </div>
+          <div class="choice">
+            <input type="radio" name="foodWaste" id="waste-no" value="no">
+            <label for="waste-no">No</label>
+          </div>
+        </div>
+        <div class="error-text" id="err-foodWaste">Please select an option.</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2><span class="badge">F</span> Water Usage</h2>
+
+      <div class="field">
+        <label>How long is your average daily shower?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="showerLength" id="shower-under-5" value="under5"><label for="shower-under-5">Under 5 mins</label></div>
+          <div class="choice"><input type="radio" name="showerLength" id="shower-5-15" value="5to15"><label for="shower-5-15">5–15 mins</label></div>
+          <div class="choice"><input type="radio" name="showerLength" id="shower-over-15" value="over15"><label for="shower-over-15">Over 15 mins</label></div>
+        </div>
+        <div class="error-text" id="err-showerLength">Please select an option.</div>
+      </div>
+
+      <div class="field">
+        <label>Do you harvest rainwater or use water-saving appliances?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="waterSaving" id="water-saving-yes" value="yes"><label for="water-saving-yes">Yes</label></div>
+          <div class="choice"><input type="radio" name="waterSaving" id="water-saving-no" value="no"><label for="water-saving-no">No</label></div>
+        </div>
+        <div class="error-text" id="err-waterSaving">Please select an option.</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2><span class="badge">G</span> Waste &amp; Recycling</h2>
+
+      <div class="field">
+        <label>Do you segregate wet and dry waste at home?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="segregatesWaste" id="segregates-yes" value="yes"><label for="segregates-yes">Yes</label></div>
+          <div class="choice"><input type="radio" name="segregatesWaste" id="segregates-no" value="no"><label for="segregates-no">No</label></div>
+        </div>
+        <div class="error-text" id="err-segregatesWaste">Please select an option.</div>
+      </div>
+
+      <div class="field">
+        <label>Do you compost organic/food waste?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="compostsWaste" id="composts-yes" value="yes"><label for="composts-yes">Yes</label></div>
+          <div class="choice"><input type="radio" name="compostsWaste" id="composts-no" value="no"><label for="composts-no">No</label></div>
+        </div>
+        <div class="error-text" id="err-compostsWaste">Please select an option.</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2><span class="badge">H</span> Shopping &amp; Clothing</h2>
+
+      <div class="field">
+        <label>How often do you buy new clothes/fast fashion items?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="clothingFrequency" id="clothes-weekly" value="weekly"><label for="clothes-weekly">Weekly</label></div>
+          <div class="choice"><input type="radio" name="clothingFrequency" id="clothes-monthly" value="monthly"><label for="clothes-monthly">Monthly</label></div>
+          <div class="choice"><input type="radio" name="clothingFrequency" id="clothes-rarely" value="rarely"><label for="clothes-rarely">Rarely</label></div>
+          <div class="choice"><input type="radio" name="clothingFrequency" id="clothes-thrift" value="thrift"><label for="clothes-thrift">Thrift only</label></div>
+        </div>
+        <div class="error-text" id="err-clothingFrequency">Please select an option.</div>
+      </div>
+
+      <div class="field">
+        <label>How many online package deliveries do you receive monthly?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="packageDeliveries" id="packages-0-2" value="0to2"><label for="packages-0-2">0–2</label></div>
+          <div class="choice"><input type="radio" name="packageDeliveries" id="packages-3-8" value="3to8"><label for="packages-3-8">3–8</label></div>
+          <div class="choice"><input type="radio" name="packageDeliveries" id="packages-10-plus" value="10plus"><label for="packages-10-plus">10+</label></div>
+        </div>
+        <div class="error-text" id="err-packageDeliveries">Please select an option.</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2><span class="badge">I</span> Digital &amp; Electronics Footprint</h2>
+
+      <div class="field">
+        <label>How many hours do you stream video/gaming daily?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="streamingHours" id="streaming-under-2" value="under2"><label for="streaming-under-2">Under 2 hrs</label></div>
+          <div class="choice"><input type="radio" name="streamingHours" id="streaming-2-5" value="2to5"><label for="streaming-2-5">2–5 hrs</label></div>
+          <div class="choice"><input type="radio" name="streamingHours" id="streaming-5-plus" value="5plus"><label for="streaming-5-plus">5+ hrs</label></div>
+        </div>
+        <div class="error-text" id="err-streamingHours">Please select an option.</div>
+      </div>
+
+      <div class="field">
+        <label>How often do you replace your smartphone or laptop?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="deviceReplacement" id="device-yearly" value="yearly"><label for="device-yearly">Every year</label></div>
+          <div class="choice"><input type="radio" name="deviceReplacement" id="device-2-3" value="2to3"><label for="device-2-3">Every 2–3 years</label></div>
+          <div class="choice"><input type="radio" name="deviceReplacement" id="device-broken" value="broken"><label for="device-broken">Only when broken</label></div>
+        </div>
+        <div class="error-text" id="err-deviceReplacement">Please select an option.</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2><span class="badge">J</span> Air &amp; Long-Distance Travel</h2>
+
+      <div class="field">
+        <label>How many short-haul flights do you take per year?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="shortHaulFlights" id="short-haul-0" value="0"><label for="short-haul-0">0</label></div>
+          <div class="choice"><input type="radio" name="shortHaulFlights" id="short-haul-1-3" value="1to3"><label for="short-haul-1-3">1–3</label></div>
+          <div class="choice"><input type="radio" name="shortHaulFlights" id="short-haul-4-plus" value="4plus"><label for="short-haul-4-plus">4+</label></div>
+        </div>
+        <div class="error-text" id="err-shortHaulFlights">Please select an option.</div>
+      </div>
+
+      <div class="field">
+        <label>How many long-haul international flights do you take per year?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="longHaulFlights" id="long-haul-0" value="0"><label for="long-haul-0">0</label></div>
+          <div class="choice"><input type="radio" name="longHaulFlights" id="long-haul-1-2" value="1to2"><label for="long-haul-1-2">1–2</label></div>
+          <div class="choice"><input type="radio" name="longHaulFlights" id="long-haul-3-plus" value="3plus"><label for="long-haul-3-plus">3+</label></div>
+        </div>
+        <div class="error-text" id="err-longHaulFlights">Please select an option.</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2><span class="badge">K</span> Renewable Energy Adoption</h2>
+
+      <div class="field">
+        <label>Does your home use rooftop solar panels?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="solarPanels" id="solar-yes" value="yes"><label for="solar-yes">Yes</label></div>
+          <div class="choice"><input type="radio" name="solarPanels" id="solar-no" value="no"><label for="solar-no">No</label></div>
+        </div>
+        <div class="error-text" id="err-solarPanels">Please select an option.</div>
+      </div>
+
+      <div class="field">
+        <label>Do you use energy-efficient (5-star / LED) appliances?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="efficientAppliances" id="efficient-all" value="all"><label for="efficient-all">All</label></div>
+          <div class="choice"><input type="radio" name="efficientAppliances" id="efficient-some" value="some"><label for="efficient-some">Some</label></div>
+          <div class="choice"><input type="radio" name="efficientAppliances" id="efficient-none" value="none"><label for="efficient-none">None</label></div>
+        </div>
+        <div class="error-text" id="err-efficientAppliances">Please select an option.</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2><span class="badge">L</span> Paper &amp; Office Consumption</h2>
+
+      <div class="field">
+        <label>How often do you print documents instead of using digital files?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="printFrequency" id="print-daily" value="daily"><label for="print-daily">Daily</label></div>
+          <div class="choice"><input type="radio" name="printFrequency" id="print-weekly" value="weekly"><label for="print-weekly">Weekly</label></div>
+          <div class="choice"><input type="radio" name="printFrequency" id="print-rarely" value="rarely"><label for="print-rarely">Rarely</label></div>
+        </div>
+        <div class="error-text" id="err-printFrequency">Please select an option.</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2><span class="badge">M</span> Renewable &amp; Green Investments</h2>
+
+      <div class="field">
+        <label>Do you invest in green funds or support eco-charities?</label>
+        <div class="choice-row">
+          <div class="choice"><input type="radio" name="greenInvesting" id="green-yes" value="yes"><label for="green-yes">Yes</label></div>
+          <div class="choice"><input type="radio" name="greenInvesting" id="green-no" value="no"><label for="green-no">No</label></div>
+        </div>
+        <div class="error-text" id="err-greenInvesting">Please select an option.</div>
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <button type="submit" class="btn-submit">Show My Score</button>
+    </div>
+  </form>
+</div>
+
+<footer>Sustainify — Sustainable Lifestyle Recommendation System</footer>
+
+<script>
+document.getElementById('calcForm').addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const travelKm = document.getElementById('travelKm').value;
+  const mode = document.querySelector('input[name="mode"]:checked');
+  const ac = document.querySelector('input[name="ac"]:checked');
+  const lightHours = document.getElementById('lightHours').value;
+  const plastic = document.querySelector('input[name="plastic"]:checked');
+  const foodWaste = document.querySelector('input[name="foodWaste"]:checked');
+  const showerLength = document.querySelector('input[name="showerLength"]:checked');
+  const waterSaving = document.querySelector('input[name="waterSaving"]:checked');
+  const segregatesWaste = document.querySelector('input[name="segregatesWaste"]:checked');
+  const compostsWaste = document.querySelector('input[name="compostsWaste"]:checked');
+  const clothingFrequency = document.querySelector('input[name="clothingFrequency"]:checked');
+  const packageDeliveries = document.querySelector('input[name="packageDeliveries"]:checked');
+  const streamingHours = document.querySelector('input[name="streamingHours"]:checked');
+  const deviceReplacement = document.querySelector('input[name="deviceReplacement"]:checked');
+  const shortHaulFlights = document.querySelector('input[name="shortHaulFlights"]:checked');
+  const longHaulFlights = document.querySelector('input[name="longHaulFlights"]:checked');
+  const solarPanels = document.querySelector('input[name="solarPanels"]:checked');
+  const efficientAppliances = document.querySelector('input[name="efficientAppliances"]:checked');
+  const printFrequency = document.querySelector('input[name="printFrequency"]:checked');
+  const greenInvesting = document.querySelector('input[name="greenInvesting"]:checked');
+
+  let valid = true;
+  function showErr(id, condition){
+    document.getElementById(id).style.display = condition ? 'block' : 'none';
+    if(condition) valid = false;
+  }
+  showErr('err-travelKm', travelKm === '' || Number(travelKm) < 0);
+  showErr('err-mode', !mode);
+  showErr('err-ac', !ac);
+  showErr('err-lightHours', lightHours === '' || Number(lightHours) < 0 || Number(lightHours) > 24);
+  showErr('err-plastic', !plastic);
+  showErr('err-foodWaste', !foodWaste);
+  showErr('err-showerLength', !showerLength);
+  showErr('err-waterSaving', !waterSaving);
+  showErr('err-segregatesWaste', !segregatesWaste);
+  showErr('err-compostsWaste', !compostsWaste);
+  showErr('err-clothingFrequency', !clothingFrequency);
+  showErr('err-packageDeliveries', !packageDeliveries);
+  showErr('err-streamingHours', !streamingHours);
+  showErr('err-deviceReplacement', !deviceReplacement);
+  showErr('err-shortHaulFlights', !shortHaulFlights);
+  showErr('err-longHaulFlights', !longHaulFlights);
+  showErr('err-solarPanels', !solarPanels);
+  showErr('err-efficientAppliances', !efficientAppliances);
+  showErr('err-printFrequency', !printFrequency);
+  showErr('err-greenInvesting', !greenInvesting);
+
+  if(!valid) return;
+
+  /* ---------- Scoring logic (out of 100) ---------- */
+  let score = 100;
+  const suggestions = [];
+  function addSuggestion(penalty, text){
+    if(penalty > 0) suggestions.push({penalty, text});
+  }
+
+  const km = Number(travelKm);
+  const modeVal = mode.value;
+
+  // Transport scoring
+  const modePenaltyPerKm = { car: 1.4, bike: 0.9, bus: 0.4, cycle: 0 };
+  const transportPenalty = Math.min(18, km * (modePenaltyPerKm[modeVal] / 2));
+  score -= transportPenalty;
+  if(modeVal === 'car' || modeVal === 'bike'){
+    addSuggestion(transportPenalty, 'Take the bus or cycle two days a week instead of driving — you could save roughly 12 kg of CO2 each week.');
+  }
+
+  // Energy scoring
+  const hrs = Number(lightHours);
+  const acPenalty = ac.value === 'yes' ? 8 : 0;
+  const lightPenalty = Math.min(8, hrs * 0.6);
+  score -= acPenalty + lightPenalty;
+  if(ac.value === 'yes'){
+    addSuggestion(acPenalty, 'Raise your AC temperature by 1-2°C and reduce usage by one hour to save electricity.');
+  }
+  if(hrs > 8){
+    addSuggestion(lightPenalty, 'Make it a habit to turn off the lights when nobody is in the room.');
+  }
+
+  // Lifestyle scoring
+  const plasticPenalty = plastic.value === 'daily' ? 8 : 3;
+  score -= plasticPenalty;
+  if(plastic.value === 'daily'){
+    addSuggestion(plasticPenalty, 'Use a steel or reusable bottle instead of a plastic bottle.');
+  }
+
+  if(foodWaste.value === 'yes'){
+    score -= 5;
+    addSuggestion(5, 'Plan portions when preparing meals to reduce food waste.');
+  }
+
+  const showerPenalty = {under5: 0, '5to15': 4, over15: 8}[showerLength.value];
+  const waterPenalty = waterSaving.value === 'no' ? 5 : 0;
+  const segregationPenalty = segregatesWaste.value === 'no' ? 6 : 0;
+  const compostPenalty = compostsWaste.value === 'no' ? 5 : 0;
+  const clothingPenalty = {weekly: 10, monthly: 5, rarely: 2, thrift: 0}[clothingFrequency.value];
+  const packagePenalty = {'0to2': 0, '3to8': 4, '10plus': 8}[packageDeliveries.value];
+  const streamingPenalty = {under2: 0, '2to5': 4, '5plus': 8}[streamingHours.value];
+  const devicePenalty = {yearly: 8, '2to3': 4, broken: 0}[deviceReplacement.value];
+  const shortHaulPenalty = {'0': 0, '1to3': 6, '4plus': 12}[shortHaulFlights.value];
+  const longHaulPenalty = {'0': 0, '1to2': 10, '3plus': 18}[longHaulFlights.value];
+  const solarPenalty = solarPanels.value === 'no' ? 6 : 0;
+  const appliancePenalty = {all: 0, some: 4, none: 8}[efficientAppliances.value];
+  const printPenalty = {daily: 6, weekly: 3, rarely: 0}[printFrequency.value];
+  const investingPenalty = greenInvesting.value === 'no' ? 3 : 0;
+
+  score -= showerPenalty + waterPenalty + segregationPenalty + compostPenalty;
+  score -= clothingPenalty + packagePenalty + streamingPenalty + devicePenalty;
+  score -= shortHaulPenalty + longHaulPenalty + solarPenalty + appliancePenalty;
+  score -= printPenalty + investingPenalty;
+
+  addSuggestion(showerPenalty, 'Keep showers under five minutes and turn off the water while soaping.');
+  addSuggestion(waterPenalty, 'Use water-saving fixtures or collect rainwater for suitable household tasks.');
+  addSuggestion(segregationPenalty, 'Separate wet and dry waste so recyclable materials can be recovered properly.');
+  addSuggestion(compostPenalty, 'Compost organic scraps to keep food waste out of landfills.');
+  addSuggestion(clothingPenalty, 'Buy fewer new clothes, choose durable pieces, and repair or thrift when possible.');
+  addSuggestion(packagePenalty, 'Group online purchases and choose slower consolidated delivery when available.');
+  addSuggestion(streamingPenalty, 'Reduce daily streaming or gaming time and choose lower video quality when practical.');
+  addSuggestion(devicePenalty, 'Keep devices longer, repair them, and replace them only when necessary.');
+  addSuggestion(shortHaulPenalty, 'Replace short-haul flights with rail, bus, or virtual meetings when possible.');
+  addSuggestion(longHaulPenalty, 'Reduce long-haul flights and combine trips to lower their outsized carbon impact.');
+  addSuggestion(solarPenalty, 'Explore rooftop solar or a community renewable-energy option for your home.');
+  addSuggestion(appliancePenalty, 'Prioritize efficient 5-star and LED appliances when replacing old equipment.');
+  addSuggestion(printPenalty, 'Use digital documents and print only when a paper copy is genuinely needed.');
+  addSuggestion(investingPenalty, 'Consider a green fund or a reputable environmental charity that matches your values.');
+
+  score = Math.max(0, Math.round(score));
+
+  // Always have at least 3 suggestions
+  const fallback = [
+    'Try public transport or carpooling whenever possible.',
+    'Avoid single-use plastic and use cloth bags instead.',
+    'Choose local and seasonal food to reduce your carbon footprint.'
+  ];
+  let i = 0;
+  while(suggestions.length < 3 && i < fallback.length){
+    if(!suggestions.some(suggestion => suggestion.text === fallback[i])) suggestions.push({penalty: 0, text: fallback[i]});
+    i++;
+  }
+
+  suggestions.sort((a, b) => b.penalty - a.penalty);
+  const topSuggestions = suggestions.slice(0, 3).map(suggestion => suggestion.text);
+
+  const params = new URLSearchParams({
+    score: score,
+    s1: topSuggestions[0] || '',
+    s2: topSuggestions[1] || '',
+    s3: topSuggestions[2] || ''
+  });
+
+  localStorage.setItem('sustainify-result', JSON.stringify({
+    score: score,
+    suggestions: topSuggestions
+  }));
+
+  window.location.href = 'result.html?' + params.toString();
+});
+</script>
+
+</body>
+</html>

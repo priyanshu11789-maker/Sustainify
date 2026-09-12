@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="forest.css">
+<title>Sustainify — Sustainable Lifestyle Recommendation System</title>
+<style>
+  :root{
+    --sky-50:#f0f8ff;
+    --sky-100:#dcefff;
+    --sky-200:#b9dffb;
+    --sky-400:#67b1e5;
+    --sky-500:#2f97dd;
+    --sky-600:#19659b;
+    --navy:#123353;
+    --ink:#213244;
+    --ink-soft:#5c6b7a;
+    --line:#d3e6f5;
+    --white:#ffffff;
+    --surface:rgba(255,255,255,.86);
+    --card-surface:rgba(255,255,255,.94);
+  }
+  :root[data-theme="dark"]{
+    --sky-50:#101d2b;
+    --sky-100:#19344b;
+    --sky-200:#285979;
+    --sky-400:#78c4f2;
+    --sky-500:#58afe6;
+    --sky-600:#3d9bd5;
+    --navy:#e4f3ff;
+    --ink:#e8f1f7;
+    --ink-soft:#a8bac8;
+    --line:#294458;
+    --white:#142433;
+    --surface:rgba(20,36,51,.86);
+    --card-surface:rgba(20,36,51,.94);
+  }
+  *{box-sizing:border-box;}
+  .forest-scene{
+    position:fixed; left:0; right:0; bottom:0; height:130px;
+    overflow:hidden; pointer-events:none; z-index:0; opacity:.82;
+  }
+  .forest-layer{position:absolute; left:50%; bottom:0; width:3200px; height:130px; transform:translateX(-50%);}
+  .forest-layer svg{display:block; width:3200px; height:130px;}
+  .forest-layer.back{opacity:.35; transform:translateX(-50%) translateY(8px);}
+  .forest-layer.mid{opacity:.48; transform:translateX(-50%) translateY(18px);}
+  .forest-layer.front{opacity:.72; transform:translateX(-50%) translateY(32px);}
+  .leaf-field{position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:0;}
+  .leaf{position:absolute; width:11px; height:20px; border-radius:100% 0 100% 0; background:var(--sky-400); opacity:.32; animation:leafDrift 12s linear infinite;}
+  body > *:not(.forest-scene):not(.leaf-field){position:relative; z-index:1;}
+  .leaf:nth-child(1){left:12%; top:18%; animation-delay:-2s;}
+  .leaf:nth-child(2){left:28%; top:42%; animation-delay:-7s; transform:scale(.7);}
+  .leaf:nth-child(3){left:54%; top:12%; animation-delay:-4s; transform:scale(.8);}
+  .leaf:nth-child(4){left:72%; top:35%; animation-delay:-9s; transform:scale(.65);}
+  .leaf:nth-child(5){left:86%; top:20%; animation-delay:-6s; transform:scale(.9);}
+  .leaf:nth-child(6){left:42%; top:65%; animation-delay:-11s; transform:scale(.6);}
+  @keyframes leafDrift{
+    0%{margin-left:-20px; transform:rotate(0deg) translateY(0);}
+    50%{margin-left:20px; transform:rotate(180deg) translateY(18px);}
+    100%{margin-left:-20px; transform:rotate(360deg) translateY(0);}
+  }
+  @media(prefers-reduced-motion:reduce){.leaf{animation:none;}}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:transparent;
+    color:var(--ink);
+    transition:background .2s, color .2s;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 20px;}
+
+  header{
+    background:var(--surface);
+    border-bottom:1px solid var(--line);
+    padding:18px 0;
+    position:sticky; top:0; z-index:10;
+  }
+  .nav-row{display:flex; align-items:center; justify-content:space-between;}
+  .logo{
+    display:inline-block; font-size:20px; font-weight:700; color:var(--navy);
+    transform-style:preserve-3d; transform-origin:center; cursor:grab;
+    animation:logoFloat 3.8s ease-in-out infinite;
+    will-change:transform;
+  }
+  .logo:active{cursor:grabbing;}
+  .logo:hover{animation-play-state:paused; transform:translate3d(0,-3px,0) rotateX(8deg) rotateY(-10deg);}
+  .logo span{display:inline-block; color:var(--sky-500); transform:translateZ(8px);}
+  @keyframes logoFloat{
+    0%,100%{transform:translate3d(0,0,0) rotateX(0deg) rotateY(-3deg);}
+    50%{transform:translate3d(0,-4px,0) rotateX(5deg) rotateY(3deg);}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .logo{animation:none;}
+    .logo:hover{transform:none;}
+  }
+  header nav a{
+    color:var(--ink-soft); text-decoration:none; font-size:14px; font-weight:600;
+    margin-left:22px;
+  }
+  header nav a:hover{color:var(--sky-600);}
+  .hero{
+    background:linear-gradient(180deg, var(--sky-50), var(--white) 85%);
+    padding:70px 0 60px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero .wrap{
+    position:relative;
+    z-index:1;
+  }
+  .hero h1{
+    font-size:34px; color:var(--navy); margin:0 0 16px; line-height:1.25;
+  }
+  .hero h1 span{color:var(--sky-500);}
+  .hero p{
+    font-size:16px; color:var(--ink-soft); max-width:900px; margin:0 auto 30px;
+  }
+  .btn-start{
+    display:inline-block; background:var(--sky-600); color:#fff; text-decoration:none;
+    font-size:16px; font-weight:700; padding:15px 38px; border-radius:11px;
+    box-shadow:0 8px 20px rgba(28,124,192,0.28);
+    transition:background .15s, transform .12s;
+  }
+  .btn-start:hover{background:var(--navy);}
+  .btn-start:active{transform:translateY(1px);}
+
+  .cards-section{padding:60px 0 80px;}
+  .cards-section h2{
+    text-align:center; font-size:24px; color:var(--navy); margin-bottom:8px;
+  }
+  .cards-section > .wrap > p{
+    text-align:center; color:var(--ink-soft); font-size:14.5px; margin:0 0 36px;
+  }
+  .cards-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:22px;
+  }
+  .card{
+    background:var(--card-surface); border:1px solid var(--line); border-radius:16px;
+    padding:28px 22px; text-align:center;
+    cursor:pointer; transition:transform .15s, box-shadow .15s;
+  }
+  .card:hover{transform:translateY(-4px); box-shadow:0 12px 26px rgba(28,124,192,0.14);}
+  .card:focus-visible{outline:3px solid var(--sky-400); outline-offset:4px;}
+  .card .icon{
+    width:56px; height:56px; border-radius:50%; background:var(--sky-100);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 16px;
+    font-size:26px;
+  }
+  .card h3{font-size:17px; color:var(--navy); margin:0 0 8px;}
+  .card p{font-size:13.5px; color:var(--ink-soft); margin:0; line-height:1.5;}
+  .card-hint{display:block; margin-top:16px; color:var(--sky-600); font-size:12px; font-weight:700;}
+  .card-tips{margin:18px 0 0; padding:14px 0 0 18px; border-top:1px solid var(--line); text-align:left; color:var(--ink); font-size:13px; line-height:1.5;}
+  .card-tips li{margin-bottom:8px;}
+  .card-tips li:last-child{margin-bottom:0;}
+
+  footer{
+    text-align:center; padding:26px 0; color:var(--ink-soft); font-size:12.5px;
+    border-top:1px solid var(--line);
+  }
+
+  @media(max-width:720px){
+    .cards-grid{grid-template-columns:1fr;}
+    .hero h1{font-size:26px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="video-background" aria-hidden="true">
+  <iframe src="https://www.youtube.com/embed/VJLZvLD_ZRc?autoplay=1&mute=1&loop=1&playlist=VJLZvLD_ZRc&controls=0&rel=0&modestbranding=1" title="Sustainify background video" allow="autoplay; encrypted-media" tabindex="-1"></iframe>
+</div>
+
+<div class="forest-scene" aria-hidden="true">
+  <div class="forest-layer back">
+    <svg width="3200" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="30,130 50,80 40,80 55,45 45,45 60,10 75,45 65,45 80,80 70,80 90,130" fill="var(--sky-100)"/><polygon points="140,130 158,90 149,90 163,58 154,58 170,28 186,58 177,58 191,90 182,90 199,130" fill="var(--sky-100)"/></svg>
+  </div>
+  <div class="forest-layer mid">
+    <svg width="3200" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="40,130 62,70 50,70 68,32 56,32 74,0 92,32 80,32 98,70 86,70 108,130" fill="var(--sky-400)"/><polygon points="150,130 168,85 158,85 173,52 163,52 180,20 197,52 187,52 202,85 192,85 210,130" fill="var(--sky-400)"/></svg>
+  </div>
+  <div class="forest-layer front">
+    <svg width="3200" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="35,130 60,55 46,55 66,10 52,10 72,-15 92,10 78,10 98,55 84,55 109,130" fill="var(--navy)"/><polygon points="150,130 172,68 160,68 177,30 165,30 184,0 203,30 191,30 208,68 196,68 218,130" fill="var(--navy)"/></svg>
+  </div>
+</div>
+<div class="leaf-field" aria-hidden="true"><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span></div>
+
+<header>
+  <div class="wrap nav-row">
+    <div class="logo">Sustain<span>ify</span></div>
+    <nav>
+      <a href="calculator1.html">Calculator</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Powering our planet:<br><span>The Brighter day Ahead 🌍</span></h1>
+    <p><strong>Real change does not come from a handful of people practicing zero-waste perfectly; it happens when millions of us make small, deliberate improvements every single day. Sustainability is a journey of continuous micro-swaps that optimize how we consume, travel, and live. When you align your daily decisions with the health of the planet, you reduce unnecessary waste, save money, and join a growing global movement dedicated to building a resilient tomorrow.</strong></p>
+    <a href="calculator1.html" class="btn-start">Start →</a>
+
+  </div>
+</section>
+
+<section class="cards-section">
+  <div class="wrap">
+    <h2>Key Areas of Focus</h2>
+    <p>The key areas of focus for sustainability are transport, energy, and food.</p>
+    <p><strong>True sustainability starts with understanding where you stand. Our system analyzes your daily lifestyle across the three core areas that matter most: your food choices, daily commute, and energy consumption. Your personalized eco-score is calculated directly from your answers in these three categories, giving you a clear starting point. Rather than expecting overwhelming change overnight, Sustainify breaks down your score to deliver tailored, high-impact micro-habits designed specifically for your routine. By taking simple, intentional steps in these key areas, you transform daily routines into measurable positive impact for the planet.</strong></p>
+
+    <p>Each card below represents a key area of focus, and provides insights and tips to help you make more sustainable choices in your daily life.</p>
+    <div class="cards-grid">
+      <div class="card" role="button" tabindex="0" aria-expanded="false" aria-controls="transport-tips">
+        <div class="icon">🚲</div>
+        <h3><strong>Transport</strong></h3>
+        <p>How far and how you travel each day, whether by bike, car, bus, or bicycle, has a major impact on your carbon footprint.</p>
+        <span class="card-hint">View tips ↓</span>
+        <ul class="card-tips" id="transport-tips" hidden>
+          <li>Walk, cycle, or use public transport for short journeys.</li>
+          <li>Combine errands into one trip and carpool when possible.</li>
+          <li>Keep your tires properly inflated to improve fuel efficiency.</li>
+        </ul>
+      </div>
+      <div class="card" role="button" tabindex="0" aria-expanded="false" aria-controls="energy-tips">
+        <div class="icon">💡</div>
+        <h3><strong>Energy</strong></h3>
+        <p>How much you use air conditioning and lights at home: small habits can make a big difference to energy use.</p>
+        <span class="card-hint">View tips ↓</span>
+        <ul class="card-tips" id="energy-tips" hidden>
+          <li>Switch to LED bulbs and turn lights off in empty rooms.</li>
+          <li>Use natural light and air whenever the weather allows.</li>
+          <li>Unplug chargers and devices when they are not in use.</li>
+        </ul>
+      </div>
+      <div class="card" role="button" tabindex="0" aria-expanded="false" aria-controls="food-tips">
+        <div class="icon">🍽️</div>
+        <h3><strong>Food</strong></h3>
+        <p>Plastic use and food waste are everyday lifestyle choices that directly affect the environment.</p>
+        <span class="card-hint">View tips ↓</span>
+        <ul class="card-tips" id="food-tips" hidden>
+          <li>Plan portions before cooking to prevent food waste.</li>
+          <li>Choose reusable bottles, bags, and containers instead of single-use plastic.</li>
+          <li>Buy local, seasonal ingredients when they are available.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>Sustainify — Sustainable Lifestyle Recommendation System</footer>
+
+</body>
+<script>
+  document.querySelectorAll('.card').forEach(function(card){
+    const tips = card.querySelector('.card-tips');
+    const hint = card.querySelector('.card-hint');
+
+    function toggleTips(){
+      const isOpen = card.getAttribute('aria-expanded') === 'true';
+      card.setAttribute('aria-expanded', String(!isOpen));
+      card.classList.toggle('is-open', !isOpen);
+      tips.hidden = isOpen;
+      hint.textContent = isOpen ? 'View tips ↓' : 'Hide tips ↑';
+    }
+
+    card.addEventListener('click', toggleTips);
+    card.addEventListener('keydown', function(event){
+      if(event.key === 'Enter' || event.key === ' '){
+        event.preventDefault();
+        toggleTips();
+      }
+    });
+  });
+</script>
+</html>

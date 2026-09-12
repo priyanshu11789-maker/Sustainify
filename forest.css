@@ -1,0 +1,249 @@
+/* Shared animated forest decoration for all Sustainify pages. */
+.forest-scene{
+	position:fixed;
+	left:0;
+	right:0;
+	bottom:0;
+	height:130px;
+	overflow:hidden;
+	pointer-events:none;
+	z-index:1 !important;
+	opacity:.82;
+}
+.forest-scene,.leaf-field{display:none !important;}
+body{
+	background-color:#163b24 !important;
+	background-image:url("https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=2200&q=90") !important;
+	background-size:cover !important;
+	background-position:center !important;
+	background-attachment:fixed !important;
+}
+.wrap,
+.hero,
+.cards-section,
+.result-hero,
+.suggestions,
+.actions,
+footer{
+	background:transparent !important;
+}
+.logo{
+	position:relative;
+	display:inline-block;
+	padding-left:30px;
+}
+.logo::before,
+.logo::after{
+	content:"";
+	position:absolute;
+	left:4px;
+	bottom:1px;
+	width:14px;
+	height:25px;
+	border-radius:100% 0 100% 0;
+	background:linear-gradient(160deg,#bff2ad,#6d956b);
+	transform:rotate(-30deg);
+	transform-origin:bottom center;
+}
+.logo::after{
+	left:12px;
+	height:21px;
+	background:linear-gradient(160deg,#d9f8c9,#86a982);
+	transform:rotate(27deg);
+}
+header,
+.section-card,
+.sugg-card,
+.card{
+	background:rgba(255,255,255,.34) !important;
+	border-color:rgba(255,255,255,.62) !important;
+	backdrop-filter:blur(4px);
+}
+.theme-toggle,
+.btn-ghost,
+.field input[type="number"],
+.field select{
+	background:rgba(255,255,255,.42) !important;
+}
+.hero h1,
+.hero p,
+.cards-section > .wrap > p,
+.card p,
+.card-tips,
+header nav a,
+.logo,
+footer{
+	color:#fff !important;
+	text-shadow:0 2px 5px rgba(0,0,0,.85);
+}
+.hero h1 span,
+.cards-section h2,
+.card h3,
+.card-hint{
+	color:#d8ffd0 !important;
+	text-shadow:0 2px 5px rgba(0,0,0,.85);
+}
+.btn-start{
+	background:#a8e889 !important;
+	color:#123b20 !important;
+	box-shadow:0 8px 22px rgba(80,180,75,.42) !important;
+}
+.btn-start:hover{background:#c7f5ad !important;}
+.card,
+.section-card,
+.sugg-card{
+	border-color:rgba(191,255,178,.58) !important;
+}
+.page-title h1,
+.result-hero h1,
+.suggestions h2{
+	color:#f3fff0 !important;
+	text-shadow:0 2px 5px rgba(0,0,0,.9);
+}
+.page-title p,
+.status-text,
+.sugg-card p,
+.sugg-card,
+.field label,
+.section-card label,
+.section-card h2{
+	color:#fff !important;
+	text-shadow:0 2px 4px rgba(0,0,0,.8);
+}
+.section-card h2{
+	color:#d8ffd0 !important;
+}
+.section-card h2 .badge{
+	background:#b7f29f !important;
+	color:#184a2b !important;
+}
+.choice label{
+	border-color:rgba(208,255,197,.68) !important;
+	background:rgba(20,75,42,.48) !important;
+	color:#f7fff5 !important;
+}
+.choice input:checked + label{
+	background:#91dc78 !important;
+	border-color:#d8ffd0 !important;
+	color:#123b20 !important;
+}
+.error-text{
+	color:#ffd2d2 !important;
+	font-weight:700;
+	text-shadow:0 1px 3px rgba(0,0,0,.8);
+}
+.ring-label strong,
+.ring-label span{
+	color:#f3fff0 !important;
+	text-shadow:0 2px 5px rgba(0,0,0,.85);
+}
+.sugg-num{
+	background:#b7f29f !important;
+	color:#184a2b !important;
+}
+.video-background{
+	position:fixed;
+	inset:0;
+	overflow:hidden;
+	pointer-events:none;
+	z-index:0;
+	background:#0b1d2a;
+	display:none !important;
+}
+.video-background iframe{
+	position:absolute;
+	top:50%;
+	left:50%;
+	width:max(100vw, 177.78vh);
+	height:max(100vh, 56.25vw);
+	transform:translate(-50%,-50%);
+	border:0;
+	pointer-events:none;
+}
+.forest-layer{
+	position:absolute;
+	left:50%;
+	bottom:0;
+	width:3200px;
+	height:130px;
+	transform:translateX(-50%);
+}
+.forest-layer svg{display:block; width:3200px; height:130px;}
+.forest-layer::after{
+	content:"";
+	position:absolute;
+	inset:0;
+	background-repeat:repeat-x;
+	background-size:220px 130px;
+}
+.forest-layer.back{
+	opacity:.35;
+	transform:translateX(-50%) translateY(8px);
+	animation:forestBack 24s ease-in-out infinite alternate;
+}
+.forest-layer.back::after{
+	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='130'%3E%3Cpath fill='%23b9dffb' d='M20 130 45 75H33L55 35H43L64 0 85 35H73L95 75H83l25 55zM145 130l20-48h-10l17-32h-10l20-30 20 30h-10l17 32h-10l20 48z'/%3E%3C/svg%3E");
+}
+.forest-layer.mid{
+	opacity:.48;
+	transform:translateX(-50%) translateY(18px);
+	animation:forestMid 18s ease-in-out infinite alternate;
+}
+.forest-layer.mid::after{
+	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='130'%3E%3Cpath fill='%235fb2ec' d='M12 130 38 65H25L50 25H38L62 0 86 25H74l25 40H86l26 65zM142 130l22-54h-11l20-36h-11l21-32 21 32h-11l20 36h-11l22 54z'/%3E%3C/svg%3E");
+}
+.forest-layer.front{
+	opacity:.72;
+	transform:translateX(-50%) translateY(32px);
+	animation:forestFront 13s ease-in-out infinite alternate;
+}
+.forest-layer.front::after{
+	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='130'%3E%3Cpath fill='%23123353' d='M5 130 32 58H18L46 15H32L60-15 88 15H74l28 43H88l27 72zM140 130l24-60h-12l21-38h-12l23-32 23 32h-12l21 38h-12l24 60z'/%3E%3C/svg%3E");
+}
+.leaf-field{
+	position:fixed;
+	inset:0;
+	overflow:hidden;
+	pointer-events:none;
+	z-index:1 !important;
+}
+.leaf{
+	position:absolute;
+	width:11px;
+	height:20px;
+	border-radius:100% 0 100% 0;
+	background:var(--sky-400);
+	opacity:.32;
+	animation:leafDrift 12s linear infinite;
+}
+.leaf:nth-child(1){left:12%; top:18%; animation-delay:-2s;}
+.leaf:nth-child(2){left:28%; top:42%; animation-delay:-7s; transform:scale(.7);}
+.leaf:nth-child(3){left:54%; top:12%; animation-delay:-4s; transform:scale(.8);}
+.leaf:nth-child(4){left:72%; top:35%; animation-delay:-9s; transform:scale(.65);}
+.leaf:nth-child(5){left:86%; top:20%; animation-delay:-6s; transform:scale(.9);}
+.leaf:nth-child(6){left:42%; top:65%; animation-delay:-11s; transform:scale(.6);}
+@keyframes forestBack{
+	from{margin-left:-18px;}
+	to{margin-left:18px;}
+}
+@keyframes forestMid{
+	from{margin-left:22px;}
+	to{margin-left:-22px;}
+}
+@keyframes forestFront{
+	from{margin-left:-30px;}
+	to{margin-left:30px;}
+}
+@keyframes leafDrift{
+	0%{margin-left:-20px; transform:rotate(0deg) translateY(0);}
+	50%{margin-left:20px; transform:rotate(180deg) translateY(18px);}
+	100%{margin-left:-20px; transform:rotate(360deg) translateY(0);}
+}
+@media(prefers-reduced-motion:reduce){
+	.forest-layer,.leaf{animation:none;}
+}
+body > *:not(.video-background):not(.forest-scene):not(.leaf-field){
+	position:relative;
+	z-index:2 !important;
+}
+.video-background{z-index:0 !important;}

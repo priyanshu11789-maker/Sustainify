@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="forest.css">
+<title>Sustainify — Your Result</title>
+<style>
+  :root{
+    --sky-50:#f0f8ff;
+    --sky-100:#dcefff;
+    --sky-200:#b9dffb;
+    --sky-400:#5fb2ec;
+    --sky-500:#2f97dd;
+    --sky-600:#1c7cc0;
+    --navy:#123353;
+    --ink:#213244;
+    --ink-soft:#5c6b7a;
+    --line:#d3e6f5;
+    --white:#ffffff;
+    --good:#2fa86a;
+    --mid:#e0a327;
+    --low:#d9534f;
+  }
+  :root[data-theme="dark"]{
+    --sky-50:#101d2b;
+    --sky-100:#19344b;
+    --sky-200:#285979;
+    --sky-400:#78c4f2;
+    --sky-500:#58afe6;
+    --sky-600:#3d9bd5;
+    --navy:#e4f3ff;
+    --ink:#e8f1f7;
+    --ink-soft:#a8bac8;
+    --line:#294458;
+    --white:#142433;
+  }
+  *{box-sizing:border-box;}
+  .forest-scene{position:fixed;left:0;right:0;bottom:0;height:130px;overflow:hidden;pointer-events:none;z-index:0;opacity:.82;}
+  .forest-layer{position:absolute;left:50%;bottom:0;width:3200px;height:130px;transform:translateX(-50%);}
+  .forest-layer svg{display:block;width:3200px;height:130px;}
+  .forest-layer.back{opacity:.35;transform:translateX(-50%) translateY(8px);}.forest-layer.mid{opacity:.48;transform:translateX(-50%) translateY(18px);}.forest-layer.front{opacity:.72;transform:translateX(-50%) translateY(32px);}
+  .leaf-field{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;}.leaf{position:absolute;width:11px;height:20px;border-radius:100% 0 100% 0;background:var(--sky-400);opacity:.32;animation:leafDrift 12s linear infinite;}.leaf:nth-child(1){left:12%;top:18%;animation-delay:-2s}.leaf:nth-child(2){left:28%;top:42%;animation-delay:-7s;transform:scale(.7)}.leaf:nth-child(3){left:54%;top:12%;animation-delay:-4s;transform:scale(.8)}.leaf:nth-child(4){left:72%;top:35%;animation-delay:-9s;transform:scale(.65)}.leaf:nth-child(5){left:86%;top:20%;animation-delay:-6s;transform:scale(.9)}.leaf:nth-child(6){left:42%;top:65%;animation-delay:-11s;transform:scale(.6)}
+  body > *:not(.forest-scene):not(.leaf-field){position:relative;z-index:1;}
+  @keyframes leafDrift{0%{margin-left:-20px;transform:rotate(0deg) translateY(0)}50%{margin-left:20px;transform:rotate(180deg) translateY(18px)}100%{margin-left:-20px;transform:rotate(360deg) translateY(0)}}
+  @media(prefers-reduced-motion:reduce){.leaf{animation:none}}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:transparent;
+    color:var(--ink);
+    min-height:100vh;
+    transition:background .2s, color .2s;
+  }
+  .wrap{max-width:640px; margin:0 auto; padding:0 20px;}
+
+  header{
+    background:var(--white);
+    border-bottom:1px solid var(--line);
+    padding:18px 0;
+  }
+  .nav-row{display:flex; align-items:center; justify-content:space-between;}
+  .logo{font-size:20px; font-weight:700; color:var(--navy);}
+  .logo span{color:var(--sky-500);}
+  header nav a{color:var(--ink-soft); text-decoration:none; font-size:14px; font-weight:600;}
+  .result-hero{padding:50px 0 20px; text-align:center;}
+  .result-hero h1{font-size:24px; color:var(--navy); margin:0 0 30px;}
+
+  .ring-wrap{position:relative; width:210px; height:210px; margin:0 auto 20px;}
+  svg{transform:rotate(-90deg);}
+  .ring-bg{fill:none; stroke:var(--sky-100); stroke-width:16;}
+  .ring-fg{
+    fill:none; stroke-width:16; stroke-linecap:round;
+    transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1), stroke 0.4s;
+  }
+  .ring-label{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+  }
+  .ring-label strong{font-size:42px; color:var(--navy); line-height:1;}
+  .ring-label span{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+
+  .status-pill{
+    display:inline-block; padding:8px 18px; border-radius:100px;
+    font-size:14px; font-weight:700; margin-bottom:8px;
+  }
+  .status-text{color:var(--ink-soft); font-size:14.5px; max-width:420px; margin:0 auto;}
+
+  .suggestions{padding:36px 0 60px;}
+  .suggestions h2{font-size:18px; color:var(--navy); margin:0 0 18px; text-align:center;}
+  .sugg-card{
+    background:var(--white); border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px; margin-bottom:14px;
+    display:flex; gap:14px; align-items:flex-start;
+    box-shadow:0 4px 14px rgba(31,124,192,0.06);
+  }
+  .sugg-num{
+    width:30px; height:30px; border-radius:50%; background:var(--sky-100); color:var(--sky-600);
+    font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .sugg-card p{margin:0; font-size:14.5px; color:var(--ink); line-height:1.5; padding-top:4px;}
+
+  .actions{text-align:center; padding-bottom:60px;}
+  .btn{
+    display:inline-block; text-decoration:none; font-weight:700; font-size:14.5px;
+    padding:13px 28px; border-radius:10px; margin:0 6px;
+  }
+  .btn-primary{background:var(--sky-600); color:#fff;}
+  .btn-primary:hover{background:var(--navy);}
+  .btn-ghost{background:var(--white); color:var(--sky-600); border:1.5px solid var(--line);}
+  .btn-ghost:hover{background:var(--sky-50);}
+
+  footer{text-align:center; padding:20px 0; color:var(--ink-soft); font-size:12.5px; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<div class="video-background" aria-hidden="true">
+  <iframe src="https://www.youtube.com/embed/VJLZvLD_ZRc?autoplay=1&mute=1&loop=1&playlist=VJLZvLD_ZRc&controls=0&rel=0&modestbranding=1" title="Sustainify background video" allow="autoplay; encrypted-media" tabindex="-1"></iframe>
+</div>
+
+<div class="forest-scene" aria-hidden="true"><div class="forest-layer back"><svg width="3200" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="30,130 50,80 40,80 55,45 45,45 60,10 75,45 65,45 80,80 70,80 90,130" fill="var(--sky-100)"/><polygon points="140,130 158,90 149,90 163,58 154,58 170,28 186,58 177,58 191,90 182,90 199,130" fill="var(--sky-100)"/></svg></div><div class="forest-layer mid"><svg width="3200" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="40,130 62,70 50,70 68,32 56,32 74,0 92,32 80,32 98,70 86,70 108,130" fill="var(--sky-400)"/><polygon points="150,130 168,85 158,85 173,52 163,52 180,20 197,52 187,52 202,85 192,85 210,130" fill="var(--sky-400)"/></svg></div><div class="forest-layer front"><svg width="3200" height="130" xmlns="http://www.w3.org/2000/svg"><polygon points="35,130 60,55 46,55 66,10 52,10 72,-15 92,10 78,10 98,55 84,55 109,130" fill="var(--navy)"/><polygon points="150,130 172,68 160,68 177,30 165,30 184,0 203,30 191,30 208,68 196,68 218,130" fill="var(--navy)"/></svg></div></div><div class="leaf-field" aria-hidden="true"><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span></div>
+
+<header>
+  <div class="wrap nav-row">
+    <div class="logo">Sustain<span>ify</span></div>
+    <nav><a href="index.html">Home</a></nav>
+  </div>
+</header>
+
+<section class="result-hero">
+  <div class="wrap">
+    <h1>Your Sustainability Score</h1>
+
+    <div class="ring-wrap">
+      <svg width="210" height="210" viewBox="0 0 210 210">
+        <circle class="ring-bg" cx="105" cy="105" r="90"></circle>
+        <circle class="ring-fg" id="ringFg" cx="105" cy="105" r="90"></circle>
+      </svg>
+      <div class="ring-label">
+        <strong id="scoreNum">0</strong>
+        <span>out of 100</span>
+      </div>
+    </div>
+
+    <div class="status-pill" id="statusPill">Loading...</div>
+    <p class="status-text" id="statusText"></p>
+  </div>
+</section>
+
+<section class="suggestions">
+  <div class="wrap">
+    <h2>3 Suggestions for You</h2>
+    <div id="suggList"></div>
+  </div>
+</section>
+
+<div class="actions">
+  <a href="calculator1.html" class="btn btn-ghost">Try Again</a>
+  <a href="index.html" class="btn btn-primary">Go Home</a>
+</div>
+
+<footer>Sustainify — Sustainable Lifestyle Recommendation System</footer>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  let savedResult = null;
+  try {
+    savedResult = JSON.parse(localStorage.getItem('sustainify-result') || 'null');
+  } catch(error) {
+    savedResult = null;
+  }
+
+  const storedScore = savedResult && Number.isFinite(Number(savedResult.score)) ? Number(savedResult.score) : null;
+  let score = Number(params.get('score'));
+  if(!params.has('score') && storedScore !== null) score = storedScore;
+  if(isNaN(score)) score = 0;
+  score = Math.max(0, Math.min(100, score));
+
+  const suggestions = params.has('score')
+    ? [params.get('s1'), params.get('s2'), params.get('s3')].filter(Boolean)
+    : (savedResult && Array.isArray(savedResult.suggestions) ? savedResult.suggestions.filter(Boolean) : []);
+
+  // Animate ring
+  const radius = 90;
+  const circumference = 2 * Math.PI * radius;
+  const ringFg = document.getElementById('ringFg');
+  ringFg.style.strokeDasharray = circumference;
+  ringFg.style.strokeDashoffset = circumference;
+
+  let color, statusLabel, statusMsg;
+  if(score >= 70){
+    color = getComputedStyle(document.documentElement).getPropertyValue('--good').trim();
+    statusLabel = 'Great! You Are Sustainable'; 
+    statusMsg = 'Your habits are kind to the environment. Keep it up!';
+  } else if(score >= 40){
+    color = getComputedStyle(document.documentElement).getPropertyValue('--mid').trim();
+    statusLabel = 'Average — Room to Improve';
+    statusMsg = 'You are moderately sustainable. Try the suggestions below to improve.';
+  } else {
+    color = getComputedStyle(document.documentElement).getPropertyValue('--low').trim();
+    statusLabel = 'Low Score — Action Needed';
+    statusMsg = 'Your carbon footprint is fairly high. Small changes can make a big difference.';
+  }
+
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('statusPill').textContent = statusLabel;
+  document.getElementById('statusPill').style.background = color + '22';
+  document.getElementById('statusPill').style.color = color;
+  document.getElementById('statusText').textContent = statusMsg;
+  ringFg.style.stroke = color;
+
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      const offset = circumference - (score/100) * circumference;
+      ringFg.style.strokeDashoffset = offset;
+    }, 100);
+  });
+
+  // Suggestions list
+  const list = document.getElementById('suggList');
+  if(suggestions.length === 0){
+    list.innerHTML = '<p style="text-align:center; color:var(--ink-soft); font-size:14px;">No suggestions found — please complete the calculator first.</p>';
+  } else {
+    list.innerHTML = suggestions.map((s,i)=>`
+      <div class="sugg-card">
+        <div class="sugg-num">${i+1}</div>
+        <p>${s}</p>
+      </div>
+    `).join('');
+  }
+</script>
+
+</body>
+</html>

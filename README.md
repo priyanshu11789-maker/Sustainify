@@ -1,4 +1,4 @@
-# 🌍 Sustainify – Sustainable Lifestyle & Carbon Calculator
+# 🌍 Sustainify – Sustainable Lifestyle Recommendation System 
 
 **Sustainify** is a lightweight, responsive frontend web application designed to help users understand, calculate, and lower their personal carbon footprint through daily actionable choices.
 
